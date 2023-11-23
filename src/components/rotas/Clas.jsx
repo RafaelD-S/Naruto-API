@@ -5,6 +5,7 @@ import Lupa from '../../assets/lupa.png'
 import DuasColunas from '../../assets/duas-colunas.png'
 import UmaColuna from '../../assets/uma-coluna-media.png'
 import UmaColunaLarga from '../../assets/uma-coluna-larga.png'
+import SeletorPagina from '../SeletorPagina'
 
 export default function Clas() {
 
@@ -21,11 +22,13 @@ export default function Clas() {
         SetColunas('50rem')
         SetColunaCor1('#f25f4c')
         SetColunaCor2('#ff8906')
+        SetColunaCor3('#ff8906')
     }
     const colunaGrande = () => {
         SetColunas('none')
         SetColunaCor1('#ff8906')
         SetColunaCor2('#f25f4c')
+        SetColunaCor3('#ff8906')
     }
     const duasColunas = () => {
         SetColunas('32.5rem')
@@ -36,23 +39,19 @@ export default function Clas() {
 
     const [clas, SetClas] = useState([])
     const [pagina, SetPagina] = useState(1)
+    const [maxDePaginas, SetMaxDePaginas] = useState()
 
     const pegarDados = async () => {
         const Dados = await axios.get(`https://www.narutodb.xyz/api/clan?page=${pagina}&limit=20`)
 
         SetClas(Dados.data.clans)
-    }
+        SetMaxDePaginas(Math.ceil(Dados.data.totalClans / 20))
 
-    useEffect(() => {
-        pegarDados()
-        if(clas.name == 'Uchiha') {
-            console.log('tem uchiha aq')
-        }
-    }, [])
+    }
 
     
     const proximaPagina = () => {
-        if(pagina >= 1 && pagina < 3) {
+        if(pagina >= 1 && pagina < maxDePaginas) {
             SetPagina(pagina + 1)
             window.scrollTo({top:0 , behavior: 'smooth'})
         }
@@ -66,6 +65,10 @@ export default function Clas() {
     useEffect(() => {
         pegarDados()
     }, [pagina])
+    const clicarNumeroPagina = (e) => {
+        SetPagina(Number(e.target.innerText))
+        window.scrollTo({top:0 , behavior: 'smooth'})
+    }
 
     
     return (
@@ -107,7 +110,7 @@ export default function Clas() {
                             Personagens
                         </h3>
                         <ul className='lista'>
-                            {item.characters.length > 20 ? item.characters.map((e) => (
+                            {item.characters.length > 5 ? item.characters.map((e) => (
                                 <li className='lista-grande'>
                                     {e.name}
                                 </li>
@@ -121,17 +124,12 @@ export default function Clas() {
                     </div>
                 ))}
             </section>
-            <section className='selecionar-pagina'>
-                <div onClick={anteriorPagina}>
-                    &lt;
-                </div>
-                <h5>
-                    {pagina}
-                </h5>
-                <div onClick={proximaPagina}>
-                    &gt;
-                </div>
-            </section>
+            <SeletorPagina 
+            clicarPagina={clicarNumeroPagina}
+            anteriorPg={anteriorPagina} 
+            proximaPg={proximaPagina} 
+            pagina={pagina}
+            limiteDePagina={maxDePaginas}/>
         </main>
     )
 }

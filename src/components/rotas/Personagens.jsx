@@ -5,6 +5,7 @@ import Lupa from '../../assets/lupa.png'
 import DuasColunas from '../../assets/duas-colunas.png'
 import UmaColuna from '../../assets/uma-coluna-media.png'
 import UmaColunaLarga from '../../assets/uma-coluna-larga.png'
+import SeletorPagina from '../SeletorPagina'
 
 export default function Personagens() {
 
@@ -38,19 +39,22 @@ export default function Personagens() {
 
     const [personagens, SetPersonagens] = useState([])
     const [pagina, SetPagina] = useState(1)
+    const [maxDePaginas, SetMaxDePaginas] = useState()
 
     const pegarDados = async () => {
         const Dados = await axios.get(`https://www.narutodb.xyz/api/character?page=${pagina}&limit=20`)
 
         SetPersonagens(Dados.data.characters)
+        SetMaxDePaginas(Math.ceil(Dados.data.totalCharacters / 20))
     }
     
+
     useEffect(() => {
         pegarDados()
     }, [])
 
     const proximaPagina = () => {
-        if(pagina >= 1 && pagina < 73) {
+        if(pagina >= 1 && pagina < maxDePaginas) {
             SetPagina(pagina + 1)
             window.scrollTo({top:0 , behavior: 'smooth'})
         }
@@ -61,12 +65,17 @@ export default function Personagens() {
             window.scrollTo({top:0 , behavior: 'smooth'})
         }
     }
+    const clicarNumeroPagina = (e) => {
+        SetPagina(Number(e.target.innerText))
+        window.scrollTo({top:0 , behavior: 'smooth'})
+    }
     useEffect(() => {
         pegarDados()
     }, [pagina])
 
     return (
         <main>
+            {maxDePaginas}
             <section className='barraDePesquisa'>
                 <div>
                     <input type="text" placeholder='Pesquisar'/>
@@ -90,7 +99,7 @@ export default function Personagens() {
                 {personagens.map((item) => (
                     <div className='item' style={{maxWidth: colunas}}>
                         <figure>
-                            <img src={item.images[0] ? item.images[0] : 'https://static.wikia.nocookie.net/narutofanworks/images/d/d5/No_Face.jpeg/revision/latest/scale-to-width-down/350?cb=20220523174355'} alt="" />
+                            <img src={item.images[0] ? item.images[0] : 'https://dash-bootstrap-components.opensource.faculty.ai/static/images/placeholder286x180.png'} alt="" />
                         </figure>
                         <a className='saiba-mais' title='Saiba Mais' target='blank_' href={`https://naruto.fandom.com/wiki/${item.name.replace(' ', '_')}`}>
                             <img src={Lupa} alt="Saiba Mais" />
@@ -120,17 +129,12 @@ export default function Personagens() {
                     </div>
                 ))}
             </section>
-            <section className='selecionar-pagina'>
-                <div onClick={anteriorPagina}>
-                    &lt;
-                </div>
-                <h5>
-                    {pagina}
-                </h5>
-                <div onClick={proximaPagina}>
-                    &gt;
-                </div>
-            </section>
+            <SeletorPagina 
+            clicarPagina={clicarNumeroPagina}
+            anteriorPg={anteriorPagina} 
+            proximaPg={proximaPagina} 
+            pagina={pagina}
+            limiteDePagina={maxDePaginas}/>
         </main>
     )
 }

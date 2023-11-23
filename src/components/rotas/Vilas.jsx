@@ -5,6 +5,7 @@ import Lupa from '../../assets/lupa.png'
 import DuasColunas from '../../assets/duas-colunas.png'
 import UmaColuna from '../../assets/uma-coluna-media.png'
 import UmaColunaLarga from '../../assets/uma-coluna-larga.png'
+import SeletorPagina from '../SeletorPagina'
 
 export default function Vilas() {
 
@@ -21,11 +22,13 @@ export default function Vilas() {
         SetColunas('50rem')
         SetColunaCor1('#f25f4c')
         SetColunaCor2('#ff8906')
+        SetColunaCor3('#ff8906')
     }
     const colunaGrande = () => {
         SetColunas('none')
         SetColunaCor1('#ff8906')
         SetColunaCor2('#f25f4c')
+        SetColunaCor3('#ff8906')
     }
     const duasColunas = () => {
         SetColunas('32.5rem')
@@ -36,15 +39,18 @@ export default function Vilas() {
 
     const [vilas, SetVilas] = useState([])
     const [pagina, SetPagina] = useState(1)
+    const [maxDePaginas, SetMaxDePaginas] = useState()
     
     const pegarDados = async () => {
         const Dados = await axios.get(`https://www.narutodb.xyz/api/village?page=${pagina}&limit=20`)
         
         SetVilas(Dados.data.villages)
+        SetMaxDePaginas(Math.ceil(Dados.data.totalVillages / 20))
+
     }
 
     const proximaPagina = () => {
-        if(pagina >= 1 && pagina < 2) {
+        if(pagina >= 1 && pagina < maxDePaginas) {
             SetPagina(pagina + 1)
             window.scrollTo({top:0 , behavior: 'smooth'})
         }
@@ -55,7 +61,11 @@ export default function Vilas() {
             window.scrollTo({top:0 , behavior: 'smooth'})
         }
     }
-
+    const clicarNumeroPagina = (e) => {
+        SetPagina(Number(e.target.innerText))
+        window.scrollTo({top:0 , behavior: 'smooth'})
+    }
+    
     useEffect(() => {
         pegarDados()
     }, [pagina])
@@ -87,7 +97,7 @@ export default function Vilas() {
                 {vilas.map((item) => (
                     <div className='item' style={{maxWidth: colunas}}>
                         <figure>
-                            <img src={item.characters[0] ? item.characters[0].images ? item.characters[0].images : 'https://dash-bootstrap-components.opensource.faculty.ai/static/images/placeholder286x180.png' : 'https://dash-bootstrap-components.opensource.faculty.ai/static/images/placeholder286x180.png'} alt="" />
+                            <img src={item.characters[0] ? item.characters[0].images[0] ? item.characters[0].images[0] : 'https://dash-bootstrap-components.opensource.faculty.ai/static/images/placeholder286x180.png' : 'https://dash-bootstrap-components.opensource.faculty.ai/static/images/placeholder286x180.png'} alt="" />
                         </figure>
                         <a className='saiba-mais' title='Saiba Mais' target='blank_' href={`https://naruto.fandom.com/wiki/${item.name.replace(' ', '_')}`}>
                             <img src={Lupa} alt="Saiba Mais" />
@@ -114,17 +124,12 @@ export default function Vilas() {
                     </div>
                 ))}
             </section>
-            <section className='selecionar-pagina'>
-                <div onClick={anteriorPagina}>
-                    &lt;
-                </div>
-                <h5>
-                    {pagina}
-                </h5>
-                <div onClick={proximaPagina}>
-                    &gt;
-                </div>
-            </section>
+            <SeletorPagina
+            clicarPagina={clicarNumeroPagina}
+            anteriorPg={anteriorPagina} 
+            proximaPg={proximaPagina} 
+            pagina={pagina}
+            limiteDePagina={maxDePaginas}/>
         </main>
     )
 }
