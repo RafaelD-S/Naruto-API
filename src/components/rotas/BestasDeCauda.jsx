@@ -42,7 +42,7 @@ export default function Bestas() {
     const [maxDePaginas, SetMaxDePaginas] = useState()
 
     const pegarDados = async () => {
-        const Dados = await axios.get(`https://www.narutodb.xyz/api/tailed-beast?page=${pagina}&limit=20`)
+        const Dados = await axios.get(`https://narutodb.xyz/api/tailed-beast?page=${pagina}&limit=20`)
 
         SetBestas(Dados.data.tailedBeasts)
         SetMaxDePaginas(Math.ceil(Dados.data.totalTailedBeasts / 20))

@@ -42,7 +42,7 @@ export default function Vilas() {
     const [maxDePaginas, SetMaxDePaginas] = useState()
     
     const pegarDados = async () => {
-        const Dados = await axios.get(`https://www.narutodb.xyz/api/village?page=${pagina}&limit=20`)
+        const Dados = await axios.get(`https://narutodb.xyz/api/village?page=${pagina}&limit=20`)
         
         SetVilas(Dados.data.villages)
         SetMaxDePaginas(Math.ceil(Dados.data.totalVillages / 20))

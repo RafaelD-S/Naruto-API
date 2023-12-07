@@ -42,7 +42,7 @@ export default function Clas() {
     const [maxDePaginas, SetMaxDePaginas] = useState()
 
     const pegarDados = async () => {
-        const Dados = await axios.get(`https://www.narutodb.xyz/api/clan?page=${pagina}&limit=20`)
+        const Dados = await axios.get(`https://narutodb.xyz/api/clan?page=${pagina}&limit=20`)
 
         SetClas(Dados.data.clans)
         SetMaxDePaginas(Math.ceil(Dados.data.totalClans / 20))

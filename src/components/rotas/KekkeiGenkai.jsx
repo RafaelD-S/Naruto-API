@@ -42,7 +42,7 @@ export default function Kekkei() {
     const [maxDePaginas, SetMaxDePaginas] = useState()
     
     const pegarDados = async () => {
-        const Dados = await axios.get(`https://www.narutodb.xyz/api/kekkei-genkai?page=${pagina}&limit=20`)
+        const Dados = await axios.get(`https://narutodb.xyz/api/kekkei-genkai?page=${pagina}&limit=20`)
         
         SetKekkei(Dados.data.kekkeigenkai)
         SetMaxDePaginas(Math.ceil(Dados.data.totalKekkeiGenkai / 20))

@@ -42,7 +42,7 @@ export default function Personagens() {
     const [maxDePaginas, SetMaxDePaginas] = useState()
 
     const pegarDados = async () => {
-        const Dados = await axios.get(`https://www.narutodb.xyz/api/character?page=${pagina}&limit=20`)
+        const Dados = await axios.get(`https://narutodb.xyz/api/character?page=${pagina}&limit=20`)
 
         SetPersonagens(Dados.data.characters)
         SetMaxDePaginas(Math.ceil(Dados.data.totalCharacters / 20))

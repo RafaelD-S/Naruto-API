@@ -42,7 +42,7 @@ export default function Times() {
     const [maxDePaginas, SetMaxDePaginas] = useState()
     
     const pegarDados = async () => {
-        const Dados = await axios.get(`https://www.narutodb.xyz/api/team?page=${pagina}&limit=20`)
+        const Dados = await axios.get(`https://narutodb.xyz/api/team?page=${pagina}&limit=20`)
         
         SetTimes(Dados.data.teams)
         SetMaxDePaginas(Math.ceil(Dados.data.totalTeams / 20))
