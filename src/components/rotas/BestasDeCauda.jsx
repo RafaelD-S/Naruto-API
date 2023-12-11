@@ -37,22 +37,23 @@ export default function Bestas() {
         SetColunaCor3('#f25f4c')
     }
 
-    const [bestas, SetBestas] = useState([])
+    const [bestas, setBestas] = useState([])
+    const [bestasFiltradas, setBestasFiltradas]= useState([])
     const [pagina, SetPagina] = useState(1)
-    const [maxDePaginas, SetMaxDePaginas] = useState()
+    const [maxDePaginas, SetMaxDePaginas] = useState([])
 
     const pegarDados = async () => {
         const Dados = await axios.get(`https://narutodb.xyz/api/tailed-beast?page=${pagina}&limit=20`)
-
-        SetBestas(Dados.data.tailedBeasts)
+        
+        setBestas(Dados.data.tailedBeasts)
+        setBestasFiltradas(Dados.data.tailedBeasts)
         SetMaxDePaginas(Math.ceil(Dados.data.totalTailedBeasts / 20))
     }
     
-
     useEffect(() => {
         pegarDados()
     }, [])
-
+    
     const proximaPagina = () => {
         if(pagina >= 1 && pagina < maxDePaginas) {
             SetPagina(pagina + 1)
@@ -69,17 +70,25 @@ export default function Bestas() {
         SetPagina(Number(e.target.innerText))
         window.scrollTo({top:0 , behavior: 'smooth'})
     }
+    
     useEffect(() => {
         pegarDados()
     }, [pagina])
+    
+    const[pesquisa, setPesquisa] = useState()
 
+    const resultado = () => {
+        const res = bestasFiltradas.filter(f => f.name.toLowerCase().includes(pesquisa.toLowerCase()))
+        setBestas(res)
+        console.log(bestasFiltradas)
+    }
     return (
         <main>
             {maxDePaginas}
             <section className='barraDePesquisa'>
                 <div>
-                    <input type="text" placeholder='Pesquisar'/>
-                    <button className='pesquisa-button'>
+                    <input type="search" placeholder='Pesquisar' value={pesquisa} onChange={(e) => setPesquisa(e.target.value)}/>
+                    <button className='pesquisa-button' onClick={resultado}>
                         <img src={Lupa} alt="" />
                     </button>
                 </div>

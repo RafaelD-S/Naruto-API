@@ -1,54 +1,32 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import './style.scss'
 import Lupa from '../../assets/lupa.png'
-import DuasColunas from '../../assets/duas-colunas.png'
-import UmaColuna from '../../assets/uma-coluna-media.png'
-import UmaColunaLarga from '../../assets/uma-coluna-larga.png'
+import './style.scss'
+
 import SeletorPagina from '../SeletorPagina'
+import BarraDePesquisa from '../BarraDePesquisa'
 
 export default function Personagens() {
 
-    const [colunas, SetColunas] = useState('50rem')
-
     // #ff8906
     // #f25f4c
-
-    const [colunaCor1, SetColunaCor1] = useState('#f25f4c')
-    const [colunaCor2, SetColunaCor2] = useState('#ff8906')
-    const [colunaCor3, SetColunaCor3] = useState('#ff8906')
-
-    const colunaMedia = () => {
-        SetColunas('50rem')
-        SetColunaCor1('#f25f4c')
-        SetColunaCor2('#ff8906')
-        SetColunaCor3('#ff8906')
-    }
-    const colunaGrande = () => {
-        SetColunas('none')
-        SetColunaCor1('#ff8906')
-        SetColunaCor2('#f25f4c')
-        SetColunaCor3('#ff8906')
-    }
-    const duasColunas = () => {
-        SetColunas('32.5rem')
-        SetColunaCor1('#ff8906')
-        SetColunaCor2('#ff8906')
-        SetColunaCor3('#f25f4c')
-    }
+    const [colunas, SetColunas] = useState('50rem')
 
     const [personagens, SetPersonagens] = useState([])
     const [pagina, SetPagina] = useState(1)
     const [maxDePaginas, SetMaxDePaginas] = useState()
+    const [personagensFiltrados, SetPersonagensFiltrados] = useState([])
 
     const pegarDados = async () => {
         const Dados = await axios.get(`https://narutodb.xyz/api/character?page=${pagina}&limit=20`)
+        const Dados2 = await axios.get(`https://narutodb.xyz/api/character?page=${pagina}&limit=2000`)
 
         SetPersonagens(Dados.data.characters)
+        SetPersonagensFiltrados(Dados2.data.characters)
         SetMaxDePaginas(Math.ceil(Dados.data.totalCharacters / 20))
     }
     
-
+    
     useEffect(() => {
         pegarDados()
     }, [])
@@ -75,26 +53,7 @@ export default function Personagens() {
 
     return (
         <main>
-            {maxDePaginas}
-            <section className='barraDePesquisa'>
-                <div>
-                    <input type="text" placeholder='Pesquisar'/>
-                    <button className='pesquisa-button'>
-                        <img src={Lupa} alt="" />
-                    </button>
-                </div>
-                <div>
-                    <button title='Uma coluna' style={{backgroundColor: colunaCor1}} onClick={colunaMedia}>
-                        <img src={UmaColuna} alt=""/>
-                    </button>
-                    <button title='Uma coluna máxima' style={{backgroundColor: colunaCor2}} onClick={colunaGrande}>
-                        <img src={UmaColunaLarga} alt=""/>
-                    </button>
-                    <button title='Duas colunas' style={{backgroundColor: colunaCor3}} onClick={duasColunas}>
-                        <img src={DuasColunas} alt=""/>
-                    </button>
-                </div>
-            </section>
+            <BarraDePesquisa/>
             <section className='container-itens'>
                 {personagens.map((item) => (
                     <div className='item' style={{maxWidth: colunas}}>
