@@ -36,6 +36,15 @@ export default function BarraDePesquisa() {
         SetColunaCor3('#f25f4c')
     }
 
+    // Aqui eu ainda to tentando fazer isso funcionar só no componente de pesquisa antes de
+    // adaptar ele pra funcionar em todos
+
+    // O do de bestas de cauda foi um teste inicial que funciona normalmente mas eu vou substituir
+    // depois também
+
+    // A lógica aqui funciona normalmente se fosse só no componente de personagem mas agora eu tenho que
+    // transferir essa lógica pra ele quando eu chamar la
+
     const[pesquisa, setPesquisa] = useState()
 
     const resultado = () => {

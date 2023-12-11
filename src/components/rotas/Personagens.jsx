@@ -8,8 +8,9 @@ import BarraDePesquisa from '../BarraDePesquisa'
 
 export default function Personagens() {
 
-    // #ff8906
-    // #f25f4c
+
+    // Essa questão das colunas eu resolvo quando eu aprender a transferir
+    // a logica pra ca
     const [colunas, SetColunas] = useState('50rem')
 
     const [personagens, SetPersonagens] = useState([])
