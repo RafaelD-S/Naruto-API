@@ -2,51 +2,55 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import './style.scss'
 import Lupa from '../../assets/lupa.png'
-import DuasColunas from '../../assets/duas-colunas.png'
-import UmaColuna from '../../assets/uma-coluna-media.png'
-import UmaColunaLarga from '../../assets/uma-coluna-larga.png'
+
+import BarraDePesquisa from '../BarraDePesquisa'
 import SeletorPagina from '../SeletorPagina'
 
 export default function Vilas() {
 
-    const [colunas, SetColunas] = useState('50rem')
-
-    // #ff8906 - Laranja
-    // #f25f4c - Salmão
-
+    const [colunas, setColunas] = useState('50rem')
     const [colunaCor1, SetColunaCor1] = useState('#f25f4c')
     const [colunaCor2, SetColunaCor2] = useState('#ff8906')
     const [colunaCor3, SetColunaCor3] = useState('#ff8906')
 
-    const colunaMedia = () => {
-        SetColunas('50rem')
-        SetColunaCor1('#f25f4c')
-        SetColunaCor2('#ff8906')
-        SetColunaCor3('#ff8906')
-    }
-    const colunaGrande = () => {
-        SetColunas('none')
-        SetColunaCor1('#ff8906')
-        SetColunaCor2('#f25f4c')
-        SetColunaCor3('#ff8906')
-    }
-    const duasColunas = () => {
-        SetColunas('32.5rem')
-        SetColunaCor1('#ff8906')
-        SetColunaCor2('#ff8906')
-        SetColunaCor3('#f25f4c')
+    const mudarColunas = (MudancaDeColunas, mudancaDeCor) => {
+        setColunas(MudancaDeColunas)
+
+        if(mudancaDeCor === 0) {
+            SetColunaCor1('#f25f4c')
+            SetColunaCor2('#ff8906') 
+            SetColunaCor3('#ff8906')
+        } else if(mudancaDeCor === 1) {
+            SetColunaCor1('#ff8906')
+            SetColunaCor2('#f25f4c')
+            SetColunaCor3('#ff8906')
+        } else {
+            SetColunaCor1('#ff8906')
+            SetColunaCor2('#ff8906')
+            SetColunaCor3('#f25f4c')
+        }
     }
 
-    const [vilas, SetVilas] = useState([])
+    const [vilas, setVilas] = useState([])
+
+    const [vilasFiltrados, setVilasFiltrados] = useState([])
+    const [vilasCompletos, setVilasCompletos] = useState([])
+
     const [pagina, SetPagina] = useState(1)
-    const [maxDePaginas, SetMaxDePaginas] = useState()
+    const [maxDePaginas, setMaxDePaginas] = useState()
+
+    const [mensagemDeErro, setMensagemDeErro] = useState('')
     
     const pegarDados = async () => {
         const Dados = await axios.get(`https://narutodb.xyz/api/village?page=${pagina}&limit=20`)
+        const DadosCompletos = await axios.get(`https://narutodb.xyz/api/village?page=${pagina}&limit=2000`)
         
-        SetVilas(Dados.data.villages)
-        SetMaxDePaginas(Math.ceil(Dados.data.totalVillages / 20))
+        setVilas(Dados.data.villages)
+        setVilasFiltrados(Dados.data.villages)
+        setVilasCompletos(DadosCompletos.data.villages)
+        setMaxDePaginas(Math.ceil(Dados.data.totalVillages / 20))
 
+        setMensagemDeErro('')
     }
 
     const proximaPagina = () => {
@@ -70,31 +74,36 @@ export default function Vilas() {
         pegarDados()
     }, [pagina])
 
+    const filtrar = (pesquisaDoComponente) => {
+        const listaFiltrada = vilasCompletos.filter(f => f.name.toLowerCase().includes(pesquisaDoComponente.toLowerCase()))
+
+        if(pesquisaDoComponente !== '' && listaFiltrada.length >= 1) {
+            setVilasFiltrados(listaFiltrada)
+            setMensagemDeErro('')
+        } 
+        else if(pesquisaDoComponente == '') {
+            setVilasFiltrados(vilas)
+            setMensagemDeErro('')
+        } 
+        else{
+            setMensagemDeErro('Nada encontrado :(')
+            setVilasFiltrados([])
+        }
+        window.scrollTo({top:0 , behavior: 'smooth'})
+    }
     
     return (
         <main>
-            <section className='barraDePesquisa'>
-                <div>
-                    <input type="text" placeholder='Pesquisar'/>
-                    <button className='pesquisa-button'>
-                        <img src={Lupa} alt="" />
-                    </button>
-                </div>
-                <div>
-                    <button title='Uma coluna' style={{backgroundColor: colunaCor1}} onClick={colunaMedia}>
-                        <img src={UmaColuna} alt=""/>
-                    </button>
-                    <button title='Uma coluna máxima' style={{backgroundColor: colunaCor2}} onClick={colunaGrande}>
-                        <img src={UmaColunaLarga} alt=""/>
-                    </button>
-                    <button title='Duas colunas' style={{backgroundColor: colunaCor3}} onClick={duasColunas}>
-                        <img src={DuasColunas} alt=""/>
-                    </button>
-                </div>
-            </section>
+            <BarraDePesquisa 
+            filtrar={filtrar}
+            mudarColunas={mudarColunas}
+            colunaCor1={colunaCor1}
+            colunaCor2={colunaCor2}
+            colunaCor3={colunaCor3}
+            />
             <section className='container-itens'>
-                
-                {vilas.map((item) => (
+            {mensagemDeErro}
+                {vilasFiltrados.map((item) => (
                     <div className='item' style={{maxWidth: colunas}}>
                         <figure>
                             <img src={item.characters[0] ? item.characters[0].images[0] ? item.characters[0].images[0] : 'https://dash-bootstrap-components.opensource.faculty.ai/static/images/placeholder286x180.png' : 'https://dash-bootstrap-components.opensource.faculty.ai/static/images/placeholder286x180.png'} alt="" />

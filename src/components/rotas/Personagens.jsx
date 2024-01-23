@@ -8,23 +8,50 @@ import BarraDePesquisa from '../BarraDePesquisa'
 
 export default function Personagens() {
 
+    const [colunas, setColunas] = useState('50rem')
+    const [colunaCor1, SetColunaCor1] = useState('#f25f4c')
+    const [colunaCor2, SetColunaCor2] = useState('#ff8906')
+    const [colunaCor3, SetColunaCor3] = useState('#ff8906')
 
-    // Essa questão das colunas eu resolvo quando eu aprender a transferir
-    // a logica pra ca
-    const [colunas, SetColunas] = useState('50rem')
+    const mudarColunas = (MudancaDeColunas, mudancaDeCor) => {
+        setColunas(MudancaDeColunas)
 
-    const [personagens, SetPersonagens] = useState([])
+        if(mudancaDeCor === 0) {
+            SetColunaCor1('#f25f4c')
+            SetColunaCor2('#ff8906') 
+            SetColunaCor3('#ff8906')
+        } else if(mudancaDeCor === 1) {
+            SetColunaCor1('#ff8906')
+            SetColunaCor2('#f25f4c')
+            SetColunaCor3('#ff8906')
+        } else {
+            SetColunaCor1('#ff8906')
+            SetColunaCor2('#ff8906')
+            SetColunaCor3('#f25f4c')
+        }
+    }
+
+
+
+    const [personagens, setPersonagens] = useState([])
+    const [personagensFiltrados, setPersonagensFiltrados] = useState([])
+    const [personagensCompletos, setPersonagensCompletos] = useState([])
+
     const [pagina, SetPagina] = useState(1)
-    const [maxDePaginas, SetMaxDePaginas] = useState()
-    const [personagensFiltrados, SetPersonagensFiltrados] = useState([])
+    const [maxDePaginas, setMaxDePaginas] = useState()
+
+    const [mensagemDeErro, setMensagemDeErro] = useState('')
 
     const pegarDados = async () => {
         const Dados = await axios.get(`https://narutodb.xyz/api/character?page=${pagina}&limit=20`)
-        const Dados2 = await axios.get(`https://narutodb.xyz/api/character?page=${pagina}&limit=2000`)
+        const DadosCompletos = await axios.get(`https://narutodb.xyz/api/character?page=${pagina}&limit=2000`)
 
-        SetPersonagens(Dados.data.characters)
-        SetPersonagensFiltrados(Dados2.data.characters)
-        SetMaxDePaginas(Math.ceil(Dados.data.totalCharacters / 20))
+        setPersonagens(Dados.data.characters)
+        setPersonagensFiltrados(Dados.data.characters)
+        setPersonagensCompletos(DadosCompletos.data.characters)
+        setMaxDePaginas(Math.ceil(Dados.data.totalCharacters / 20))
+
+        setMensagemDeErro('')
     }
     
     
@@ -32,6 +59,7 @@ export default function Personagens() {
         pegarDados()
     }, [])
 
+    
     const proximaPagina = () => {
         if(pagina >= 1 && pagina < maxDePaginas) {
             SetPagina(pagina + 1)
@@ -52,11 +80,36 @@ export default function Personagens() {
         pegarDados()
     }, [pagina])
 
+    const filtrar = (pesquisaDoComponente) => {
+        const listaFiltrada = personagensCompletos.filter(f => f.name.toLowerCase().includes(pesquisaDoComponente.toLowerCase()))
+
+        if(pesquisaDoComponente !== '' && listaFiltrada.length >= 1) {
+            setPersonagensFiltrados(listaFiltrada)
+            setMensagemDeErro('')
+        } 
+        else if(pesquisaDoComponente == '') {
+            setPersonagensFiltrados(personagens)
+            setMensagemDeErro('')
+        } 
+        else{
+            setMensagemDeErro('Nada encontrado :(')
+            setPersonagensFiltrados([])
+        }
+        window.scrollTo({top:0 , behavior: 'smooth'})
+    }
+
     return (
         <main>
-            <BarraDePesquisa/>
+            <BarraDePesquisa 
+            filtrar={filtrar}
+            mudarColunas={mudarColunas}
+            colunaCor1={colunaCor1}
+            colunaCor2={colunaCor2}
+            colunaCor3={colunaCor3}
+            />
             <section className='container-itens'>
-                {personagens.map((item) => (
+                {mensagemDeErro}
+                {personagensFiltrados.map((item) => (
                     <div className='item' style={{maxWidth: colunas}}>
                         <figure>
                             <img src={item.images[0] ? item.images[0] : 'https://dash-bootstrap-components.opensource.faculty.ai/static/images/placeholder286x180.png'} alt="" />

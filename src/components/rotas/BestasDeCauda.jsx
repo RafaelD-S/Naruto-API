@@ -1,53 +1,56 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import './style.scss'
 import Lupa from '../../assets/lupa.png'
-import DuasColunas from '../../assets/duas-colunas.png'
-import UmaColuna from '../../assets/uma-coluna-media.png'
-import UmaColunaLarga from '../../assets/uma-coluna-larga.png'
+import './style.scss'
+
 import SeletorPagina from '../SeletorPagina'
+import BarraDePesquisa from '../BarraDePesquisa'
 
 export default function Bestas() {
 
-    const [colunas, SetColunas] = useState('50rem')
-
-    // #ff8906
-    // #f25f4c
-
+    const [colunas, setColunas] = useState('50rem')
     const [colunaCor1, SetColunaCor1] = useState('#f25f4c')
     const [colunaCor2, SetColunaCor2] = useState('#ff8906')
     const [colunaCor3, SetColunaCor3] = useState('#ff8906')
 
-    const colunaMedia = () => {
-        SetColunas('50rem')
-        SetColunaCor1('#f25f4c')
-        SetColunaCor2('#ff8906')
-        SetColunaCor3('#ff8906')
-    }
-    const colunaGrande = () => {
-        SetColunas('none')
-        SetColunaCor1('#ff8906')
-        SetColunaCor2('#f25f4c')
-        SetColunaCor3('#ff8906')
-    }
-    const duasColunas = () => {
-        SetColunas('32.5rem')
-        SetColunaCor1('#ff8906')
-        SetColunaCor2('#ff8906')
-        SetColunaCor3('#f25f4c')
+    const mudarColunas = (MudancaDeColunas, mudancaDeCor) => {
+
+        setColunas(MudancaDeColunas)
+
+        if(mudancaDeCor === 0) {
+            SetColunaCor1('#f25f4c')
+            SetColunaCor2('#ff8906') 
+            SetColunaCor3('#ff8906')
+        } else if(mudancaDeCor === 1) {
+            SetColunaCor1('#ff8906')
+            SetColunaCor2('#f25f4c')
+            SetColunaCor3('#ff8906')
+        } else {
+            SetColunaCor1('#ff8906')
+            SetColunaCor2('#ff8906')
+            SetColunaCor3('#f25f4c')
+        }
     }
 
     const [bestas, setBestas] = useState([])
-    const [bestasFiltradas, setBestasFiltradas]= useState([])
+    const [bestasFiltrados, setBestasFiltradas] = useState([])
+    const [bestasCompletos, setBestasCompletos] = useState([])
+
     const [pagina, SetPagina] = useState(1)
     const [maxDePaginas, SetMaxDePaginas] = useState([])
 
+    const [mensagemDeErro, setMensagemDeErro] = useState('')
+
     const pegarDados = async () => {
         const Dados = await axios.get(`https://narutodb.xyz/api/tailed-beast?page=${pagina}&limit=20`)
+        const DadosCompletos = await axios.get(`https://narutodb.xyz/api/tailed-beast?page=${pagina}&limit=2000`)
         
         setBestas(Dados.data.tailedBeasts)
         setBestasFiltradas(Dados.data.tailedBeasts)
+        setBestasCompletos(DadosCompletos.data.tailedBeasts)
         SetMaxDePaginas(Math.ceil(Dados.data.totalTailedBeasts / 20))
+
+        setMensagemDeErro('')
     }
     
     useEffect(() => {
@@ -74,38 +77,37 @@ export default function Bestas() {
     useEffect(() => {
         pegarDados()
     }, [pagina])
-    
-    const[pesquisa, setPesquisa] = useState()
 
-    const resultado = () => {
-        const res = bestasFiltradas.filter(f => f.name.toLowerCase().includes(pesquisa.toLowerCase()))
-        setBestas(res)
-        console.log(bestasFiltradas)
+    const filtrar = (pesquisaDoComponente) => {
+        const listaFiltrada = bestasCompletos.filter(f => f.name.toLowerCase().includes(pesquisaDoComponente.toLowerCase()))
+
+        if(pesquisaDoComponente !== '' && listaFiltrada.length >= 1) {
+            setBestasFiltradas(listaFiltrada)
+            setMensagemDeErro('')
+        } 
+        else if(pesquisaDoComponente == '') {
+            setBestasFiltradas(bestas)
+            setMensagemDeErro('')
+        } 
+        else{
+            setMensagemDeErro('Nada encontrado :(')
+            setBestasFiltradas([])
+        }
+        window.scrollTo({top:0 , behavior: 'smooth'})
     }
+    
     return (
         <main>
-            {maxDePaginas}
-            <section className='barraDePesquisa'>
-                <div>
-                    <input type="search" placeholder='Pesquisar' value={pesquisa} onChange={(e) => setPesquisa(e.target.value)}/>
-                    <button className='pesquisa-button' onClick={resultado}>
-                        <img src={Lupa} alt="" />
-                    </button>
-                </div>
-                <div>
-                    <button title='Uma coluna' style={{backgroundColor: colunaCor1}} onClick={colunaMedia}>
-                        <img src={UmaColuna} alt=""/>
-                    </button>
-                    <button title='Uma coluna máxima' style={{backgroundColor: colunaCor2}} onClick={colunaGrande}>
-                        <img src={UmaColunaLarga} alt=""/>
-                    </button>
-                    <button title='Duas colunas' style={{backgroundColor: colunaCor3}} onClick={duasColunas}>
-                        <img src={DuasColunas} alt=""/>
-                    </button>
-                </div>
-            </section>
+         <BarraDePesquisa 
+            filtrar={filtrar}
+            mudarColunas={mudarColunas}
+            colunaCor1={colunaCor1}
+            colunaCor2={colunaCor2}
+            colunaCor3={colunaCor3}
+            />
             <section className='container-itens'>
-                {bestas.map((item) => (
+                {mensagemDeErro}
+                {bestasFiltrados.map((item) => (
                     <div className='item' style={{maxWidth: colunas}}>
                         <figure>
                             <img src={item.images[0] ? item.images[0] : item.images[1] ? item.images[1] : 'https://dash-bootstrap-components.opensource.faculty.ai/static/images/placeholder286x180.png'} alt="" />
