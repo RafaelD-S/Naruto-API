@@ -7,15 +7,16 @@ footer {
     section {
         align-items: center;
         display: flex;
-        width: 21.5rem;
-        justify-content: space-around;
+        max-width: 18.5rem;
+        width: 100%;
+        justify-content: space-between;
     }
     a {
         color: #ff8906;
         text-decoration: none;
-        display: flex;
-        justify-content: space-around;
-        width: 7rem;
+        display: grid;
+        grid-template-columns: .5fr 2fr;
+        gap: 5px;
         align-items: center;
 
         &:hover {
@@ -24,11 +25,11 @@ footer {
         }
     }
     img {
-        width: 20px;
+        width: 16px;
     }
 }
 @media(max-width: 400px) {
     footer {
-        font-size: .85em;
+        font-size: .75em;
     }
 }
