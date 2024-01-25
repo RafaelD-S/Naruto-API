@@ -79,6 +79,8 @@ export default function Personagens() {
     useEffect(() => {
         pegarDados()
     }, [pagina])
+    
+    const [aparecerSeletorDePagina, setAparecerSeletorDePagina] = useState(true)
 
     const filtrar = (pesquisaDoComponente) => {
         const listaFiltrada = personagensCompletos.filter(f => f.name.toLowerCase().includes(pesquisaDoComponente.toLowerCase()))
@@ -86,17 +88,21 @@ export default function Personagens() {
         if(pesquisaDoComponente !== '' && listaFiltrada.length >= 1) {
             setPersonagensFiltrados(listaFiltrada)
             setMensagemDeErro('')
+            setAparecerSeletorDePagina(false)
         } 
         else if(pesquisaDoComponente == '') {
             setPersonagensFiltrados(personagens)
             setMensagemDeErro('')
+            setAparecerSeletorDePagina(true)
         } 
         else{
             setMensagemDeErro('Nada encontrado :(')
             setPersonagensFiltrados([])
+            setAparecerSeletorDePagina(false)
         }
         window.scrollTo({top:0 , behavior: 'smooth'})
     }
+
 
     return (
         <main>
@@ -142,12 +148,12 @@ export default function Personagens() {
                     </div>
                 ))}
             </section>
-            <SeletorPagina 
+            {aparecerSeletorDePagina && <SeletorPagina 
             clicarPagina={clicarNumeroPagina}
             anteriorPg={anteriorPagina} 
             proximaPg={proximaPagina} 
             pagina={pagina}
-            limiteDePagina={maxDePaginas}/>
+            limiteDePagina={maxDePaginas}/>}
         </main>
     )
 }
