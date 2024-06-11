@@ -40,18 +40,18 @@ export default function Main() {
     return (
         <main>
             <section className="first-section-main">
-
-                {sessoes.map((e) => (
-                <Link to={e.pagina} className='link'>
-                    <figure style={{backgroundImage: `url(${e.imagem})`}}>
-                        <figcaption>
-                            {e.nome}
-                        </figcaption>
-                    </figure>
-                </Link>
-                ))}
-
-
+                <div className='main-links-container'>
+                    {sessoes.map((e) => (
+                    <Link to={e.pagina}>
+                        <figure>
+                            <img src={e.imagem} alt={e.nome} />
+                            <figcaption>
+                                {e.nome}
+                            </figcaption>
+                        </figure>
+                    </Link>
+                    ))}
+                </div>
             </section>
             <section className='second-section-main'>
                 <div>
